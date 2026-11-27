@@ -50,16 +50,18 @@ async function reviewCard(a) {
   const wrap = el("div", { class: "review" });
   const label = el("input", { value: a.label, maxlength: "80", "aria-label": "Album name" });
   const year = el("input", { value: a.year ?? "", maxlength: "4", inputmode: "numeric", placeholder: "Year", "aria-label": "Year" });
+  const by = el("input", { value: a.ownerName || "", maxlength: "60", placeholder: "Shared by", "aria-label": "Shared by" });
   const note = el("input", { maxlength: "300", placeholder: "Reason, if you turn it down (they'll see this)", "aria-label": "Reason" });
   const thumbs = el("div", { class: "thumbs" });
   wrap.append(...[
     el("p", { class: "hint", text: "From " + a.ownerName + " (" + a.owner + ") · " + a.photoCount + " photos · sent " + when(a.submittedAt) }),
     el("div", { class: "fields" }, label, year),
+    el("label", { class: "hint", text: "Card says \u201cshared by\u201d:" }, by),
     a.description ? el("p", { text: "“" + a.description + "”" }) : null,
     thumbs,
     note,
     el("div", { class: "actions" },
-      button("Approve", false, () => api("albums/" + a.id + "/review", { action: "approve", label: label.value, year: year.value })),
+      button("Approve", false, () => api("albums/" + a.id + "/review", { action: "approve", label: label.value, year: year.value, by: by.value })),
       button("Turn down", true, () => api("albums/" + a.id + "/review", { action: "reject", note: note.value }), true)),
   ].filter(Boolean));
   try {
