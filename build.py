@@ -288,8 +288,11 @@ def main():
     if events_dir.is_dir():
         for old in events_dir.iterdir():
             if old.is_dir() and old.name not in keep:
-                shutil.rmtree(old)
-                print(f"removed old event {old.name}")
+                try:
+                    shutil.rmtree(old)
+                    print(f"removed old event {old.name}")
+                except OSError:
+                    print(f"could not remove old event folder {old} (it is no longer linked; delete it by hand)")
     for ev in data["events"]:
         build_event(ev, src, out, data)
     build_index(data, out)
