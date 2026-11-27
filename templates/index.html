@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}}</title>
+  <meta name="description" content="{{tagline}}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-text">
+      <p class="eyebrow">Welcome to</p>
+      <h1>{{title}}</h1>
+      <p class="tagline">{{tagline}}</p>
+      <p class="stats">{{events_count}} gatherings &middot; {{photos_count}} photos</p>
+    </div>
+    <div class="hero-photos" aria-hidden="true">{{hero}}</div>
+  </header>
+
+  <nav class="jump">{{nav}}</nav>
+
+  <main>{{sections}}
+  </main>
+
+  <footer>
+    <p>Made with love for the Sibilia family and friends.</p>
+  </footer>
+</body>
+</html>

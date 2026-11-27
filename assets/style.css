@@ -1,0 +1,151 @@
+:root {
+  --paper: #faf6ef;
+  --card: #ffffff;
+  --ink: #2b2420;
+  --muted: #74675c;
+  --accent: #9b2c2c;
+  --accent-soft: #f1e4d6;
+  --line: #e7dccd;
+  --shadow: 0 2px 6px rgba(60, 40, 20, .08), 0 10px 24px rgba(60, 40, 20, .08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 17px/1.55 "Source Sans 3", system-ui, sans-serif;
+}
+
+h1, h2, h3 { font-family: "Playfair Display", Georgia, serif; margin: 0; }
+
+/* Hero */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 32px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 72px 24px 56px;
+}
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+  font-size: 22px;
+}
+.hero h1 { font-size: clamp(40px, 6vw, 68px); line-height: 1.05; }
+.tagline { font-size: 20px; color: var(--muted); margin: 18px 0 10px; max-width: 30ch; }
+.stats {
+  display: inline-block;
+  margin: 8px 0 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.hero-photos { position: relative; height: 420px; }
+.polaroid {
+  position: absolute;
+  width: 46%;
+  height: auto;
+  padding: 10px 10px 34px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+}
+.p0 { left: 2%;  top: 4%;  transform: rotate(-7deg); z-index: 2; }
+.p1 { left: 50%; top: 0;   transform: rotate(5deg); }
+.p2 { left: 26%; top: 34%; transform: rotate(-2deg); z-index: 3; }
+.p3 { left: 0;   top: 56%; transform: rotate(4deg); z-index: 1; }
+.p4 { left: 54%; top: 50%; transform: rotate(-5deg); z-index: 2; }
+
+/* Jump links */
+.jump {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: rgba(250, 246, 239, .94);
+  backdrop-filter: blur(6px);
+  border-block: 1px solid var(--line);
+}
+.jump a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+.jump a:hover { background: var(--accent-soft); color: var(--accent); }
+
+/* Sections */
+main { max-width: 1180px; margin: 0 auto; padding: 8px 24px 40px; }
+.category { padding-top: 48px; scroll-margin-top: 64px; }
+.category h2 {
+  font-size: 30px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--line);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 22px;
+}
+
+.card {
+  display: block;
+  background: var(--card);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  color: inherit;
+  text-decoration: none;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.card:hover { transform: translateY(-4px); box-shadow: 0 4px 10px rgba(60,40,20,.12), 0 18px 36px rgba(60,40,20,.14); }
+.card-photo { aspect-ratio: 4 / 3; background: var(--accent-soft); }
+.card-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card-body { padding: 14px 16px 16px; }
+.card-year {
+  display: block;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .06em;
+}
+.card h3 { font-size: 20px; line-height: 1.25; margin: 2px 0 4px; }
+.card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  padding: 32px 16px 48px;
+  border-top: 1px solid var(--line);
+}
+
+/* Phones */
+@media (max-width: 760px) {
+  .hero { grid-template-columns: 1fr; padding: 40px 16px 32px; text-align: center; }
+  .tagline { margin-inline: auto; }
+  .hero-photos { height: 300px; max-width: 420px; width: 100%; margin: 0 auto; }
+  .jump { justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; }
+  .jump a { white-space: nowrap; }
+  main { padding: 0 16px 32px; }
+  .category h2 { font-size: 24px; }
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .card h3 { font-size: 17px; }
+}
