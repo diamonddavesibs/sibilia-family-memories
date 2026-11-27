@@ -316,3 +316,9 @@ body.welcome {
 .upload-banner strong { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .upload-banner:hover strong, .upload-banner:focus strong { text-decoration-thickness: 2px; }
 @media (max-width: 600px) { .upload-banner span { display: block; } }
+
+/* "Back to top" link in the footer */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+.to-top { display: inline-block; padding: 8px 18px; border-radius: 999px; background: var(--accent-soft); text-decoration: none; }
+.to-top:hover, .to-top:focus { text-decoration: underline; }
