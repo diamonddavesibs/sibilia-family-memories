@@ -9,7 +9,7 @@
     { "id": "parties", "title": "Parties & Celebrations" },
     { "id": "picnics", "title": "Uncle Eddie's Father's Day Picnics" }
   ],
-  "hero": ["4th2000bob/2000_42.jpg", "whelpley/2003/P6151293.JPG", "halloween06/PA313471.JPG", "fourth2002/4th_2002 026.jpg", "bobjen/PIC00036.jpg"],
+  "hero": ["4th2000bob/2000_42.jpg", "whelpley/2003/P6151293.JPG", "rose/rose-25.jpg", "fourth2002/4th_2002 026.jpg", "bobjen/PIC00036.jpg"],
   "events": [
     { "id": "fourth-2000-bobby", "category": "fourth", "title": "Fourth of July at Bobby's", "year": 2000, "folder": "4th2000bob", "cover": "2000_42.jpg", "photos": 51 },
     { "id": "fourth-2001", "category": "fourth", "title": "Fourth of July", "year": 2001, "folder": "4th2001bob", "cover": "PIC00039.jpg", "photos": 54 },
@@ -20,7 +20,6 @@
     { "id": "helen-75th", "category": "parties", "title": "Helen's 75th Birthday Brunch", "year": null, "folder": "sibiliapages/helen", "cover": "mom30.jpg", "photos": 40 },
     { "id": "rose-40th", "category": "parties", "title": "Rose's 40th Birthday", "year": null, "folder": "rose", "cover": "rose-25.jpg", "photos": 25 },
     { "id": "anita-75th", "category": "parties", "title": "Sr. Anita's 75th Birthday", "year": 2003, "folder": "anita/images", "cover": "P1010589.JPG", "photos": 25 },
-    { "id": "halloween-2006", "category": "parties", "title": "Halloween", "year": 2006, "folder": "halloween06", "cover": "PA313471.JPG", "photos": 23 },
     { "id": "thanksgiving-2001", "category": "parties", "title": "Thanksgiving", "year": 2001, "folder": "thanksgiving", "cover": "t-22.jpg", "photos": 28 },
     { "id": "carmine-donna", "category": "parties", "title": "Carmine & Donna", "year": 2004, "folder": "carmine-donna/images", "cover": "P7302349.JPG", "photos": 75 },
     { "id": "giuseppe-jill", "category": "parties", "title": "Giuseppe & Jill", "year": 2005, "folder": "giuseppe-jill/images", "cover": "P6112857.JPG", "photos": 106 },

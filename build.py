@@ -193,6 +193,14 @@ def main():
             save_jpeg(cover, out / "covers" / f"{ev['id']}.jpg", COVER_SIZE, crop=True)
         else:
             print(f"missing cover for {ev['id']}: {cover}")
+    # Remove pages for events that were taken out of events.json.
+    keep = {ev["id"] for ev in data["events"]}
+    events_dir = out / "events"
+    if events_dir.is_dir():
+        for old in events_dir.iterdir():
+            if old.is_dir() and old.name not in keep:
+                shutil.rmtree(old)
+                print(f"removed old event {old.name}")
     for ev in data["events"]:
         build_event(ev, src, out, data)
     build_index(data, out)
