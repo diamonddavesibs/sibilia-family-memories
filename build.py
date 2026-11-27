@@ -113,6 +113,30 @@ def sort_key(ev):
     return (ev.get("year") is None, ev.get("year") or 0, ev["title"])
 
 
+def home_page(data):
+    """The landing page's file name: home.html when there is a welcome page in front."""
+    return "home.html" if data["site"].get("splash") else ""
+
+
+def build_welcome(data, src, out):
+    """Front door: the original Sibilia Family Album artwork, linking to the landing page."""
+    site = data["site"]
+    art = src / site["splash"]
+    name = "welcome" + art.suffix.lower()
+    (out / "assets").mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(art, out / "assets" / name)
+    with Image.open(art) as im:
+        w, h = im.size
+    page = (ROOT / "templates" / "welcome.html").read_text(encoding="utf-8")
+    page = (page.replace("{{title}}", esc(site["title"]))
+                .replace("{{tagline}}", esc(site["tagline"]))
+                .replace("{{splash}}", name)
+                .replace("{{splash_w}}", str(w))
+                .replace("{{splash_h}}", str(h))
+                .replace("{{since}}", esc(site.get("since", ""))))
+    (out / "index.html").write_text(page, encoding="utf-8")
+
+
 def build_index(data, out):
     site = data["site"]
     hero = "".join(
@@ -144,7 +168,7 @@ def build_index(data, out):
                 .replace("{{sections}}", "".join(sections))
                 .replace("{{events_count}}", str(len(data["events"])))
                 .replace("{{photos_count}}", f"{total:,}"))
-    (out / "index.html").write_text(page, encoding="utf-8")
+    (out / (home_page(data) or "index.html")).write_text(page, encoding="utf-8")
 
 
 def build_event(ev, src, out, data):
@@ -176,6 +200,7 @@ def build_event(ev, src, out, data):
                 .replace("{{label}}", esc(event_label(ev)))
                 .replace("{{year}}", year)
                 .replace("{{count}}", str(len(items)))
+                .replace("{{home}}", home_page(data))
                 .replace("{{tiles}}", tiles))
     (dest / "index.html").write_text(page, encoding="utf-8")
 
@@ -214,6 +239,8 @@ def main():
     for ev in data["events"]:
         build_event(ev, src, out, data)
     build_index(data, out)
+    if data["site"].get("splash"):
+        build_welcome(data, src, out)
     manifest_file.write_text(json.dumps(MANIFEST, indent=0), encoding="utf-8")
     print(f"Built {len(data['events'])} events into {out}")
 

@@ -2,7 +2,8 @@
   "site": {
     "title": "Sibilia Family Memories",
     "tagline": "Picnics, parties and good times, saved for the whole family.",
-    "since": 2000
+    "since": "the late 1990s",
+    "splash": "sibilia2.gif"
   },
   "categories": [
     { "id": "fourth", "title": "Fourth of July Picnics" },

@@ -256,3 +256,48 @@ body.viewing { overflow: hidden; }
   .viewer-prev, .viewer-next { top: auto; bottom: 16px; transform: none; }
   .viewer figcaption { padding: 0 4px 60px; }
 }
+
+/* Welcome page (the original Sibilia Family Album artwork) */
+body.welcome {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at center, #fffdf8 0%, var(--paper) 55%, #efe5d4 100%);
+}
+.welcome-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  padding: 32px 16px;
+  text-align: center;
+}
+.welcome-art img {
+  display: block;
+  width: min(452px, 82vw);
+  height: auto;
+  filter: drop-shadow(0 12px 24px rgba(60, 40, 20, .18));
+  transition: transform .3s ease;
+}
+.welcome-art:hover img { transform: scale(1.02) rotate(-.5deg); }
+.enter {
+  display: inline-block;
+  padding: 14px 30px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 19px;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(155, 44, 44, .28);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.enter:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(155, 44, 44, .32); }
+.welcome-note {
+  margin: 0;
+  color: var(--muted);
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+}
