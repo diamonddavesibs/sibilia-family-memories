@@ -5,7 +5,7 @@ The family photo site for sibilia.us: Fourth of July picnics, parties, family pi
 ## How it works
 
 - `events.json` lists every event: its title, year, section, the folder its photos come from, and its cover photo. Adding an event means adding one entry here.
-- `build.py` reads the photos from the old site folder (it never changes them), makes web-sized copies, and writes the finished site to `dist/`.
+- `build.py` reads the photos from the old site folder (it never changes them), makes web-sized copies and thumbnails, picks up the old photo captions, and writes the finished site to `dist/`: the landing page plus one gallery page per event, with a full-size photo viewer you can swipe through.
 - `templates/` and `assets/` hold the page layout and styling.
 
 Photos are not stored in this repository. The originals stay on the family computer.

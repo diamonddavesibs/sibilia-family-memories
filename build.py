@@ -11,6 +11,7 @@ Needs Python 3 and Pillow (pip install pillow).
 import argparse
 import html
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -19,14 +20,36 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parent
 COVER_SIZE = (800, 600)
 HERO_SIZE = 640
+PHOTO_SIZE = 1600
+THUMB_SIZE = (400, 300)
+PHOTO_EXT = (".jpg", ".jpeg", ".png")
+# Old page titles that are not real captions.
+GENERIC_TITLE = re.compile(
+    r"^(new page|untitled|page title|this is the page|\d+[-_ ]?\d*|"
+    r"(4th|fourth) of july.*|bobby & jenny.*|rose's 40th.*|helen|"
+    r"thanksgiving.*|halloween.*|.*picnic.*|baltimore.*|uncle eddie|helen pix\d*)$",
+    re.I,
+)
 
 
 def esc(s):
     return html.escape(str(s), quote=True)
 
 
+def natural_key(name):
+    return [int(t) if t.isdigit() else t.lower() for t in re.split(r"(\d+)", name)]
+
+
+MANIFEST = {}  # output file -> the source photo it was made from
+
+
 def save_jpeg(src, dest, size, crop=False):
     dest.parent.mkdir(parents=True, exist_ok=True)
+    key = dest.as_posix()
+    if (MANIFEST.get(key) == str(src) and dest.exists()
+            and dest.stat().st_mtime >= src.stat().st_mtime):
+        return
+    MANIFEST[key] = str(src)
     with Image.open(src) as im:
         im = ImageOps.exif_transpose(im).convert("RGB")
         if crop:
@@ -34,6 +57,39 @@ def save_jpeg(src, dest, size, crop=False):
         else:
             im.thumbnail((size, size), Image.LANCZOS)
         im.save(dest, "JPEG", quality=82, optimize=True, progressive=True)
+
+
+def find_photos(folder, min_size):
+    """Full-size photos directly in the folder, in natural order."""
+    photos = []
+    for f in sorted(folder.iterdir(), key=lambda p: natural_key(p.name)):
+        if not f.is_file() or f.suffix.lower() not in PHOTO_EXT:
+            continue
+        try:
+            with Image.open(f) as im:
+                if max(im.size) < min_size or min(im.size) < min_size * 0.5:
+                    continue
+        except Exception:
+            continue
+        photos.append(f)
+    return photos
+
+
+def find_captions(folder):
+    """Captions from the old one-photo-per-page HTML files: {image name: title}."""
+    captions = {}
+    for page in folder.glob("*.htm*"):
+        text = page.read_text(encoding="latin-1", errors="ignore")
+        imgs = re.findall(r'<img[^>]+src="([^"]+)"', text, re.I)
+        title = re.search(r"<title>([^<]*)", text, re.I)
+        if len(imgs) != 1 or not title:
+            continue
+        cap = html.unescape(title.group(1)).replace("\xa0", " ").strip()
+        cap = re.sub(r"\s+", " ", cap)
+        cap = re.sub(r",(?=\S)", ", ", cap)
+        if cap and not GENERIC_TITLE.match(cap):
+            captions[Path(imgs[0]).name.lower()] = cap
+    return captions
 
 
 def event_label(ev):
@@ -55,6 +111,30 @@ def card(ev):
 
 def sort_key(ev):
     return (ev.get("year") is None, ev.get("year") or 0, ev["title"])
+
+
+def home_page(data):
+    """The landing page's file name: home.html when there is a welcome page in front."""
+    return "home.html" if data["site"].get("splash") else ""
+
+
+def build_welcome(data, src, out):
+    """Front door: the original Sibilia Family Album artwork, linking to the landing page."""
+    site = data["site"]
+    art = src / site["splash"]
+    name = "welcome" + art.suffix.lower()
+    (out / "assets").mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(art, out / "assets" / name)
+    with Image.open(art) as im:
+        w, h = im.size
+    page = (ROOT / "templates" / "welcome.html").read_text(encoding="utf-8")
+    page = (page.replace("{{title}}", esc(site["title"]))
+                .replace("{{tagline}}", esc(site["tagline"]))
+                .replace("{{splash}}", name)
+                .replace("{{splash_w}}", str(w))
+                .replace("{{splash_h}}", str(h))
+                .replace("{{since}}", esc(site.get("since", ""))))
+    (out / "index.html").write_text(page, encoding="utf-8")
 
 
 def build_index(data, out):
@@ -88,7 +168,41 @@ def build_index(data, out):
                 .replace("{{sections}}", "".join(sections))
                 .replace("{{events_count}}", str(len(data["events"])))
                 .replace("{{photos_count}}", f"{total:,}"))
-    (out / "index.html").write_text(page, encoding="utf-8")
+    (out / (home_page(data) or "index.html")).write_text(page, encoding="utf-8")
+
+
+def build_event(ev, src, out, data):
+    folder = src / ev["folder"]
+    if not folder.is_dir():
+        print(f"missing folder for {ev['id']}: {folder}")
+        return
+    photos = find_photos(folder, ev.get("minSize", 400))
+    captions = find_captions(folder)
+    dest = out / "events" / ev["id"]
+    items = []
+    for i, f in enumerate(photos, 1):
+        name = f"{i:03d}.jpg"
+        save_jpeg(f, dest / "photos" / name, PHOTO_SIZE)
+        save_jpeg(f, dest / "thumbs" / name, THUMB_SIZE, crop=True)
+        cap = captions.get(f.name.lower(), "")
+        items.append((name, cap))
+    ev["photos"] = len(items)
+
+    tiles = "".join(
+        f'''
+      <a class="tile" href="photos/{n}" data-caption="{esc(c)}"><img src="thumbs/{n}" alt="{esc(c or event_label(ev))}" loading="lazy" width="400" height="300"></a>'''
+        for n, c in items
+    )
+    year = f'<p class="event-year">{esc(ev["year"])}</p>' if ev.get("year") else ""
+    page = (ROOT / "templates" / "event.html").read_text(encoding="utf-8")
+    page = (page.replace("{{site_title}}", esc(data["site"]["title"]))
+                .replace("{{title}}", esc(ev["title"]))
+                .replace("{{label}}", esc(event_label(ev)))
+                .replace("{{year}}", year)
+                .replace("{{count}}", str(len(items)))
+                .replace("{{home}}", home_page(data))
+                .replace("{{tiles}}", tiles))
+    (dest / "index.html").write_text(page, encoding="utf-8")
 
 
 def main():
@@ -100,6 +214,10 @@ def main():
     data = json.loads((ROOT / "events.json").read_text(encoding="utf-8"))
 
     out.mkdir(parents=True, exist_ok=True)
+    # Kept next to the output folder, not inside it, so it never gets uploaded.
+    manifest_file = out.resolve().parent / f".{out.resolve().name}-manifest.json"
+    if manifest_file.exists():
+        MANIFEST.update(json.loads(manifest_file.read_text(encoding="utf-8")))
     shutil.copytree(ROOT / "assets", out / "assets", dirs_exist_ok=True)
 
     for i, rel in enumerate(data["hero"]):
@@ -110,7 +228,20 @@ def main():
             save_jpeg(cover, out / "covers" / f"{ev['id']}.jpg", COVER_SIZE, crop=True)
         else:
             print(f"missing cover for {ev['id']}: {cover}")
+    # Remove pages for events that were taken out of events.json.
+    keep = {ev["id"] for ev in data["events"]}
+    events_dir = out / "events"
+    if events_dir.is_dir():
+        for old in events_dir.iterdir():
+            if old.is_dir() and old.name not in keep:
+                shutil.rmtree(old)
+                print(f"removed old event {old.name}")
+    for ev in data["events"]:
+        build_event(ev, src, out, data)
     build_index(data, out)
+    if data["site"].get("splash"):
+        build_welcome(data, src, out)
+    manifest_file.write_text(json.dumps(MANIFEST, indent=0), encoding="utf-8")
     print(f"Built {len(data['events'])} events into {out}")
 
 
