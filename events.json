@@ -10,7 +10,7 @@
     { "id": "parties", "title": "Parties & Celebrations" },
     { "id": "picnics", "title": "Uncle Eddie's Father's Day Picnics" }
   ],
-  "hero": ["4th2000bob/2000_42.jpg", "whelpley/2003/P6151293.JPG", "rose/rose-25.jpg", "fourth2002/4th_2002 026.jpg", "bobjen/PIC00036.jpg"],
+  "hero": ["4th2000bob/2000_7.jpg", "anita/images/P1010589.JPG", "sibiliapages/helen/mom13.jpg", "bobjen/PIC00039.jpg", "whelpley/PIC00041.jpg"],
   "events": [
     { "id": "fourth-2000-bobby", "category": "fourth", "title": "Fourth of July at Bobby's", "year": 2000, "folder": "4th2000bob", "cover": "2000_42.jpg", "photos": 51 },
     { "id": "fourth-2001", "category": "fourth", "title": "Fourth of July", "year": 2001, "folder": "4th2001bob", "cover": "PIC00039.jpg", "photos": 54 },
