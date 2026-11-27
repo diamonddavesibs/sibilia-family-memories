@@ -301,3 +301,18 @@ body.welcome {
   font-family: "Playfair Display", Georgia, serif;
   font-style: italic;
 }
+
+/* Invitation to share photos, across the top of the landing page */
+.upload-banner {
+  display: block;
+  padding: 12px 16px;
+  background: var(--accent);
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  font-size: 17px;
+  line-height: 1.4;
+}
+.upload-banner strong { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.upload-banner:hover strong, .upload-banner:focus strong { text-decoration-thickness: 2px; }
+@media (max-width: 600px) { .upload-banner span { display: block; } }

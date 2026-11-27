@@ -159,6 +159,16 @@ def upload_link(site):
     return f'<p><a href="{esc(url)}">Family members: share your photos</a></p>'
 
 
+def upload_banner(site):
+    """Banner across the top of the landing page inviting family to make an album."""
+    url = site.get("uploadUrl", "")
+    if not url.startswith("https://"):
+        return ""
+    return (f'<a class="upload-banner" href="{esc(url)}">'
+            '<span>Have photos from a family gathering?</span> '
+            '<strong>Click here to upload and make your own album &rarr;</strong></a>')
+
+
 def build_index(data, out):
     site = data["site"]
     hero = "".join(
@@ -190,6 +200,7 @@ def build_index(data, out):
                 .replace("{{nav}}", nav)
                 .replace("{{sections}}", "".join(sections))
                 .replace("{{upload_link}}", upload_link(site))
+                .replace("{{upload_banner}}", upload_banner(site))
                 .replace("{{events_count}}", str(len(data["events"])))
                 .replace("{{photos_count}}", f"{total:,}"))
     (out / (home_page(data) or "index.html")).write_text(page, encoding="utf-8")

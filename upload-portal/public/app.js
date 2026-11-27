@@ -49,6 +49,7 @@ async function loadMine() {
       el("strong", { text: a.label + (a.year ? " (" + a.year + ")" : "") }),
       el("span", { class: "hint", text: a.photoCount + " photos" + (a.note ? " · " + a.note : "") }));
     const li = el("li", {}, info, el("span", { class: "badge " + a.status, text: STATUS[a.status] || a.status }));
+    if (a.status === "published") li.append(el("a", { class: "mail", href: "https://sibilia.us/home.html#family", text: "See it on the site" }));
     if (a.status === "uploading" || a.status === "pending") {
       const b = el("button", { class: "quiet", type: "button", text: "Withdraw" });
       b.onclick = async () => {
