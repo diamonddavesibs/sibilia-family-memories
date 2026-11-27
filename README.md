@@ -1,6 +1,6 @@
 # Sibilia Family Memories
 
-The family photo site for sibilia.us: Fourth of July picnics, golf outings, parties and more.
+The family photo site for sibilia.us: Fourth of July picnics, parties, family picnics and more.
 
 ## How it works
 
