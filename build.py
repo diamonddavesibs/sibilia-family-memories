@@ -189,7 +189,8 @@ def main():
     data = json.loads((ROOT / "events.json").read_text(encoding="utf-8"))
 
     out.mkdir(parents=True, exist_ok=True)
-    manifest_file = out / ".build-manifest.json"
+    # Kept next to the output folder, not inside it, so it never gets uploaded.
+    manifest_file = out.resolve().parent / f".{out.resolve().name}-manifest.json"
     if manifest_file.exists():
         MANIFEST.update(json.loads(manifest_file.read_text(encoding="utf-8")))
     shutil.copytree(ROOT / "assets", out / "assets", dirs_exist_ok=True)
