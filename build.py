@@ -40,10 +40,16 @@ def natural_key(name):
     return [int(t) if t.isdigit() else t.lower() for t in re.split(r"(\d+)", name)]
 
 
+MANIFEST = {}  # output file -> the source photo it was made from
+
+
 def save_jpeg(src, dest, size, crop=False):
     dest.parent.mkdir(parents=True, exist_ok=True)
-    if dest.exists() and dest.stat().st_mtime >= src.stat().st_mtime:
+    key = dest.as_posix()
+    if (MANIFEST.get(key) == str(src) and dest.exists()
+            and dest.stat().st_mtime >= src.stat().st_mtime):
         return
+    MANIFEST[key] = str(src)
     with Image.open(src) as im:
         im = ImageOps.exif_transpose(im).convert("RGB")
         if crop:
@@ -183,6 +189,9 @@ def main():
     data = json.loads((ROOT / "events.json").read_text(encoding="utf-8"))
 
     out.mkdir(parents=True, exist_ok=True)
+    manifest_file = out / ".build-manifest.json"
+    if manifest_file.exists():
+        MANIFEST.update(json.loads(manifest_file.read_text(encoding="utf-8")))
     shutil.copytree(ROOT / "assets", out / "assets", dirs_exist_ok=True)
 
     for i, rel in enumerate(data["hero"]):
@@ -204,6 +213,7 @@ def main():
     for ev in data["events"]:
         build_event(ev, src, out, data)
     build_index(data, out)
+    manifest_file.write_text(json.dumps(MANIFEST, indent=0), encoding="utf-8")
     print(f"Built {len(data['events'])} events into {out}")
 
 
