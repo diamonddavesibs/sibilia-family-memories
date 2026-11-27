@@ -10,15 +10,16 @@ build.py run gives it a card and a gallery.
 
 Every photo goes through four checks before it can reach the site:
   1. It is downloaded into a quarantine folder, never straight into the site.
-  2. A virus scan (ClamAV's clamscan) runs over the quarantine folder.
-     If clamscan is not installed the import stops, unless you pass
-     --skip-virus-scan on purpose.
+  2. A virus scan runs over the quarantine folder: Microsoft Defender on
+     Windows, or ClamAV's clamscan elsewhere. If neither is available the
+     import stops, unless you pass --skip-virus-scan on purpose.
   3. Pillow opens it and it must really be a JPEG, PNG or HEIC photo of a
      sensible size (no "decompression bombs").
   4. It is re-saved as a brand-new JPEG from the picture alone. Anything
      hidden inside the original file, and phone data such as GPS location,
      is left behind. Only these clean copies are kept.
 
+On Windows, double-click import-uploads.bat instead (it installs what it needs).
 Needs: pip install pillow pillow-heif boto3
 Settings come from uploads.env next to this script (never put it in git):
     R2_ACCOUNT_ID=...
@@ -106,19 +107,40 @@ def put_json(r2, bucket, key, data):
     r2.put_object(Bucket=bucket, Key=key, Body=json.dumps(data).encode(), ContentType="application/json")
 
 
-def virus_scan(folder):
-    """True if clean. Raises if the scanner is missing or fails."""
-    scanner = shutil.which("clamscan")
-    if not scanner:
-        raise FileNotFoundError("clamscan")
-    res = subprocess.run([scanner, "--recursive", "--infected", "--no-summary", str(folder)],
-                         capture_output=True, text=True)
-    if res.returncode == 0:
-        return True
-    if res.returncode == 1:
-        print(res.stdout.strip())
-        return False
-    raise RuntimeError(f"virus scan failed: {res.stderr.strip() or res.stdout.strip()}")
+def defender_path():
+    if os.name != "nt":
+        return None
+    for base in (os.environ.get("ProgramFiles", r"C:\Program Files"),):
+        exe = Path(base) / "Windows Defender" / "MpCmdRun.exe"
+        if exe.exists():
+            return exe
+    return None
+
+
+def virus_scan(folder, expected):
+    """True if clean. Raises FileNotFoundError if no scanner is available."""
+    defender = defender_path()
+    if defender:
+        res = subprocess.run([str(defender), "-Scan", "-ScanType", "3", "-File", str(folder),
+                              "-DisableRemediation"], capture_output=True, text=True)
+        if res.returncode == 2:
+            print(res.stdout.strip()[-500:])
+            return False
+        if res.returncode != 0:
+            raise RuntimeError(f"virus scan failed (Defender code {res.returncode})")
+    else:
+        scanner = shutil.which("clamscan")
+        if not scanner:
+            raise FileNotFoundError("no virus scanner")
+        res = subprocess.run([scanner, "--recursive", "--infected", "--no-summary", str(folder)],
+                             capture_output=True, text=True)
+        if res.returncode == 1:
+            print(res.stdout.strip())
+            return False
+        if res.returncode != 0:
+            raise RuntimeError(f"virus scan failed: {res.stderr.strip() or res.stdout.strip()}")
+    # Real-time protection may already have removed a bad file on download.
+    return all(f.exists() for f in expected)
 
 
 def clean_copy(src, dest):
@@ -190,22 +212,25 @@ def main():
         shutil.rmtree(box, ignore_errors=True)
         box.mkdir(parents=True)
         keys, _ = list_keys(r2, bucket, f"albums/{aid}/photos/")
-        files = []
+        files, blocked = [], False
         for k in sorted(keys):
             name = k.rsplit("/", 1)[-1]
             if PHOTO_KEY.match(name):
-                r2.download_file(bucket, k, str(box / name))
+                try:
+                    r2.download_file(bucket, k, str(box / name))
+                except OSError:
+                    blocked = True  # antivirus refused to let the file be written
                 files.append(box / name)
 
         if args.skip_virus_scan:
             print("  Virus scan skipped (--skip-virus-scan).")
         else:
             try:
-                clean = virus_scan(box)
+                clean = not blocked and virus_scan(box, files)
             except FileNotFoundError:
                 shutil.rmtree(quarantine, ignore_errors=True)
-                sys.exit("ClamAV (clamscan) is not installed, so nothing was imported.\n"
-                         "Install it, or run again with --skip-virus-scan.")
+                sys.exit("No virus scanner found (Microsoft Defender or ClamAV), so nothing was imported.\n"
+                         "Install one, or run again with --skip-virus-scan.")
             if not clean:
                 print(f"  VIRUS FOUND in '{album['label']}'. Album not imported; marked rejected.")
                 album.update(status="rejected", note="A file failed the virus scan.",
