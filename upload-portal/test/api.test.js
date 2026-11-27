@@ -113,3 +113,27 @@ test("caps open albums per person", async () => {
   for (let i = 0; i < 5; i++) assert.equal((await call(env, rose, "POST", "albums", { label: "A" + i })).status, 201);
   assert.equal((await call(env, rose, "POST", "albums", { label: "too many" })).status, 429);
 });
+
+test("adding photos to your own album", async () => {
+  const env = { UPLOADS: new FakeR2() };
+  await call(env, david, "POST", "admin/requests", { action: "approve", email: rose.email, name: "Rose" });
+  await call(env, david, "POST", "admin/requests", { action: "approve", email: stranger.email, name: "X" });
+  const { body: { album } } = await call(env, rose, "POST", "albums", { label: "Picnic", year: 2024 });
+  let r = await call(env, rose, "POST", "albums", { addTo: album.id });
+  assert.equal(r.status, 409, "not before the album is sent");
+  await call(env, rose, "PUT", `albums/${album.id}/photos/1`, JPEG);
+  await call(env, rose, "POST", `albums/${album.id}/submit`, {});
+  r = await call(env, stranger, "POST", "albums", { addTo: album.id });
+  assert.equal(r.status, 404, "only the owner can add");
+  r = await call(env, rose, "POST", "albums", { addTo: album.id, label: "ignored" });
+  assert.equal(r.status, 201);
+  assert.equal(r.body.album.addTo, album.id);
+  assert.equal(r.body.album.label, "Picnic");
+  assert.equal(r.body.album.year, 2024);
+  const extra = r.body.album.id;
+  r = await call(env, rose, "POST", "albums", { addTo: extra });
+  assert.equal(r.status, 404, "no add-ons of add-ons");
+  await call(env, rose, "PUT", `albums/${extra}/photos/1`, JPEG);
+  r = await call(env, rose, "POST", `albums/${extra}/submit`, {});
+  assert.equal(r.body.album.status, "pending");
+});

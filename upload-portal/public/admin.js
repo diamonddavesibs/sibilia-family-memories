@@ -40,6 +40,18 @@ function button(text, quiet, fn, confirm) {
   return b;
 }
 
+const SITE = "https://sibilia.us/home.html#family";
+const PORTAL = location.origin;
+
+// Opens your own email program with a ready-to-send note. Nothing is sent from this page.
+function mailLink(to, subject, body) {
+  const a = el("a", { class: "mail", text: "Email them" });
+  a.href = "mailto:" + to + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  return a;
+}
+
+function firstName(name) { return String(name || "").split(" ")[0] || "there"; }
+
 function showError(msg) { const e = $("#error"); e.textContent = msg; e.hidden = !msg; }
 
 function when(iso) { return iso ? new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : ""; }
@@ -53,7 +65,9 @@ async function reviewCard(a) {
   const by = el("input", { value: a.ownerName || "", maxlength: "60", placeholder: "Shared by", "aria-label": "Shared by" });
   const note = el("input", { maxlength: "300", placeholder: "Reason, if you turn it down (they'll see this)", "aria-label": "Reason" });
   const thumbs = el("div", { class: "thumbs" });
+  if (a.addTo) { label.disabled = true; year.disabled = true; }
   wrap.append(...[
+    a.addTo ? el("p", { text: "More photos for an album already sent: \u201c" + a.label + "\u201d" }) : null,
     el("p", { class: "hint", text: "From " + a.ownerName + " (" + a.owner + ") · " + a.photoCount + " photos · sent " + when(a.submittedAt) }),
     el("div", { class: "fields" }, label, year),
     el("label", { class: "hint", text: "Card says \u201cshared by\u201d:" }, by),
@@ -95,7 +109,7 @@ async function load() {
   if (!pending.children.length) pending.append(el("p", { class: "hint", text: "Nothing to review." }));
 
   const row = (a, ...actions) => el("li", {},
-    el("div", { class: "grow" }, el("strong", { text: a.label + (a.year ? " (" + a.year + ")" : "") }),
+    el("div", { class: "grow" }, el("strong", { text: (a.addTo ? "More photos for " : "") + a.label + (a.year ? " (" + a.year + ")" : "") }),
       el("span", { class: "hint", text: a.ownerName + " · " + a.photoCount + " photos · " + when(a.reviewedAt || a.createdAt) + (a.note ? " · " + a.note : "") })),
     el("span", { class: "badge " + a.status, text: a.status }), ...actions);
 
@@ -111,6 +125,9 @@ async function load() {
   for (const m of members) {
     mem.append(el("li", {},
       el("div", { class: "grow" }, el("strong", { text: m.name }), el("span", { class: "hint", text: m.email + " · since " + when(m.approvedAt) })),
+      mailLink(m.email, "You can now share photos on Sibilia Family Memories",
+        "Hi " + firstName(m.name) + ",\n\nYou're all set to share photos on the family site. Go to " + PORTAL +
+        ", sign in with this email address, and make a new album.\n\nDavid"),
       button("Remove", true, () => api("requests", { action: "remove", email: m.email }), true)));
   }
   empty(mem, "No members yet.");
@@ -120,6 +137,9 @@ async function load() {
   for (const a of albums.filter((a) => ["published", "rejected", "uploading"].includes(a.status))) {
     const acts = [];
     if (a.status === "rejected") acts.push(button("Approve after all", true, () => api("albums/" + a.id + "/review", { action: "approve" })));
+    if (a.status === "published" && a.owner) acts.push(mailLink(a.owner, "Your album is on Sibilia Family Memories",
+      "Hi " + firstName(a.ownerName) + ",\n\nYour album \u201c" + a.label + "\u201d is now on the family site. Have a look: " + SITE +
+      "\n\nThanks for sharing!\nDavid"));
     if (a.status !== "published") acts.push(button("Delete", true, () => api("albums/" + a.id + "/review", { action: "delete" }), true));
     past.append(row(a, ...acts));
   }

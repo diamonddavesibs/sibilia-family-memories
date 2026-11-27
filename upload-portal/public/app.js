@@ -5,6 +5,7 @@ const $ = (s) => document.querySelector(s);
 const OK_TYPES = /\.(jpe?g|png|heic|heif)$/i;
 let limits = { photoBytes: 30 * 1024 * 1024, photosPerAlbum: 300 };
 let picked = []; // { file, fig }
+let addTo = null; // album being added to, or null for a new album
 
 async function api(path, opts = {}) {
   const res = await fetch("/api/" + path, {
@@ -45,10 +46,17 @@ async function loadMine() {
   list.replaceChildren();
   $("#mine").hidden = !albums.length;
   for (const a of albums) {
+    const title = a.addTo ? "More photos for " + a.label : a.label + (a.year ? " (" + a.year + ")" : "");
     const info = el("div", { class: "grow" },
-      el("strong", { text: a.label + (a.year ? " (" + a.year + ")" : "") }),
+      el("strong", { text: title }),
       el("span", { class: "hint", text: a.photoCount + " photos" + (a.note ? " · " + a.note : "") }));
     const li = el("li", {}, info, el("span", { class: "badge " + a.status, text: STATUS[a.status] || a.status }));
+    if (a.status === "published") li.append(el("a", { class: "mail", href: "https://sibilia.us/home.html#family", text: "See it on the site" }));
+    if (!a.addTo && ["pending", "approved", "published"].includes(a.status)) {
+      const add = el("button", { class: "quiet", type: "button", text: "Add photos" });
+      add.onclick = () => startAdding(a);
+      li.append(add);
+    }
     if (a.status === "uploading" || a.status === "pending") {
       const b = el("button", { class: "quiet", type: "button", text: "Withdraw" });
       b.onclick = async () => {
@@ -60,6 +68,27 @@ async function loadMine() {
     }
     list.append(li);
   }
+}
+
+function startAdding(a) {
+  addTo = a;
+  $("#upload-title").textContent = "Add photos to \u201c" + a.label + "\u201d";
+  $("#upload-intro").textContent = "David will look these over too, then they'll join the same album on the site.";
+  $("#album-fields").hidden = true;
+  $("#label").required = false;
+  $("#send").textContent = "Upload photos";
+  $("#cancel-add").hidden = false;
+  $("#upload").scrollIntoView({ behavior: "smooth" });
+}
+
+function stopAdding() {
+  addTo = null;
+  $("#upload-title").textContent = "New album";
+  $("#upload-intro").textContent = "Your photos become a new card on the family site once David has looked them over.";
+  $("#album-fields").hidden = false;
+  $("#label").required = true;
+  $("#send").textContent = "Upload album";
+  $("#cancel-add").hidden = true;
 }
 
 // Two taps to confirm, without a pop-up dialog.
@@ -132,7 +161,8 @@ async function sendAlbum(ev) {
     const fd = new FormData(form);
     const { album } = await api("albums", {
       method: "POST",
-      body: JSON.stringify({ label: fd.get("label"), year: fd.get("year"), description: fd.get("description") }),
+      body: JSON.stringify(addTo ? { addTo: addTo.id }
+        : { label: fd.get("label"), year: fd.get("year"), description: fd.get("description") }),
     });
     let done = 0;
     const failed = [];
@@ -150,9 +180,10 @@ async function sendAlbum(ev) {
     await Promise.all([worker(), worker(), worker()]);
     if (failed.length === picked.length) throw new Error("None of the photos could be uploaded. " + failed[0]);
     await api("albums/" + album.id + "/submit", { method: "POST", body: "{}" });
-    status.textContent = "Done! David will look over your album soon.";
+    status.textContent = addTo ? "Done! David will look over your new photos soon." : "Done! David will look over your album soon.";
     if (failed.length) { err.textContent = "Some photos were skipped: " + failed.join("; "); err.hidden = false; }
     form.reset();
+    stopAdding();
     picked = [];
     $("#picked").replaceChildren();
     summary();
@@ -192,6 +223,7 @@ $("#request-form").addEventListener("submit", async (ev) => {
   } catch (e) { err.textContent = e.message; err.hidden = false; }
 });
 $("#album-form").addEventListener("submit", sendAlbum);
+$("#cancel-add").addEventListener("click", stopAdding);
 $("#files").addEventListener("change", (e) => { addFiles(e.target.files); e.target.value = ""; });
 const drop = $("#drop");
 drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });

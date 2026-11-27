@@ -230,9 +230,17 @@ def main():
 
     quarantine = ROOT / ".quarantine"
     added = 0
+    # Main albums first, so photos added later can join their card.
+    approved.sort(key=lambda a: (bool(a.get("addTo")), a.get("createdAt", "")))
     for album in approved:
         aid = album["id"]
-        event_id = f"family-{aid}"
+        parent_id = album.get("addTo")
+        if parent_id and not ALBUM_ID.match(parent_id):
+            continue
+        event_id = f"family-{parent_id or aid}"
+        if parent_id and event_id not in {e["id"] for e in events}:
+            print(f"  Extra photos for '{album['label']}' will be added once that album is on the site.")
+            continue
         box = quarantine / aid
         shutil.rmtree(box, ignore_errors=True)
         box.mkdir(parents=True)
@@ -267,14 +275,19 @@ def main():
                 shutil.rmtree(box, ignore_errors=True)
                 continue
 
-        dest_dir = uploads / aid
-        shutil.rmtree(dest_dir, ignore_errors=True)
+        dest_dir = uploads / (parent_id or aid)
+        if parent_id:
+            # Keep the album's photos and number the new ones after them.
+            start = max((int(p.stem) for p in dest_dir.glob("[0-9][0-9][0-9].jpg")), default=0)
+        else:
+            shutil.rmtree(dest_dir, ignore_errors=True)
+            start = 0
         good, problems = 0, []
         for f in files:
             if f.suffix == ".heic" and not HEIF:
                 problems.append(f"{f.name}: HEIC support not installed")
                 continue
-            err = clean_copy(f, dest_dir / f"{good + 1:03d}.jpg")
+            err = clean_copy(f, dest_dir / f"{start + good + 1:03d}.jpg")
             if err:
                 problems.append(f"{f.name}: {err}")
             else:
@@ -286,18 +299,23 @@ def main():
             print(f"  No usable photos in '{album['label']}'; nothing added.")
             continue
 
-        entry = {
-            "id": event_id,
-            "category": "family",
-            "title": album["label"],
-            "year": album.get("year"),
-            "folder": aid,
-            "cover": "001.jpg",
-            "photos": good,
-            "by": album.get("ownerName", ""),
-            "minSize": 50,
-        }
-        events = [e for e in events if e["id"] != event_id] + [entry]
+        if parent_id:
+            entry = next(e for e in events if e["id"] == event_id)
+            entry["photos"] = start + good
+            events = [e for e in events if e["id"] != event_id] + [entry]
+        else:
+            entry = {
+                "id": event_id,
+                "category": "family",
+                "title": album["label"],
+                "year": album.get("year"),
+                "folder": aid,
+                "cover": "001.jpg",
+                "photos": good,
+                "by": album.get("ownerName", ""),
+                "minSize": 50,
+            }
+            events = [e for e in events if e["id"] != event_id] + [entry]
         uploads.mkdir(parents=True, exist_ok=True)
         events_file.write_text(json.dumps(events, indent=2), encoding="utf-8")
 
@@ -308,7 +326,10 @@ def main():
         if keys:
             r2.delete_objects(Bucket=bucket, Delete={"Objects": [{"Key": k} for k in keys]})
         added += 1
-        print(f"  Added '{album['label']}' with {good} clean photos.")
+        if parent_id:
+            print(f"  Added {good} more clean photos to '{album['label']}'.")
+        else:
+            print(f"  Added '{album['label']}' with {good} clean photos.")
 
     shutil.rmtree(quarantine, ignore_errors=True)
     if added:
