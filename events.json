@@ -8,10 +8,9 @@
     { "id": "fourth", "title": "Fourth of July Picnics" },
     { "id": "parties", "title": "Parties & Celebrations" },
     { "id": "picnics", "title": "Uncle Eddie's Father's Day Picnics" },
-    { "id": "trips", "title": "Trips & Outings" },
     { "id": "family", "title": "Family" }
   ],
-  "hero": ["4th2000bob/2000_42.jpg", "hershey/dsP7173741.jpg", "halloween06/PA313471.JPG", "fourth2002/4th_2002 026.jpg", "bobjen/PIC00036.jpg"],
+  "hero": ["4th2000bob/2000_42.jpg", "whelpley/2003/P6151293.JPG", "halloween06/PA313471.JPG", "fourth2002/4th_2002 026.jpg", "bobjen/PIC00036.jpg"],
   "events": [
     { "id": "fourth-2000-bobby", "category": "fourth", "title": "Fourth of July at Bobby's", "year": 2000, "folder": "4th2000bob", "cover": "2000_42.jpg", "photos": 51 },
     { "id": "fourth-2001", "category": "fourth", "title": "Fourth of July", "year": 2001, "folder": "4th2001bob", "cover": "PIC00039.jpg", "photos": 54 },
@@ -31,10 +30,6 @@
     { "id": "fathers-day-2003", "category": "picnics", "title": "Father's Day Picnic", "year": 2003, "folder": "whelpley/2003", "cover": "P6151293.JPG", "photos": 60 },
     { "id": "fathers-day-2005", "category": "picnics", "title": "Father's Day Picnic", "year": 2005, "folder": "whelpley/2005", "cover": "P1012976.JPG", "photos": 15 },
     { "id": "fathers-day-more", "category": "picnics", "title": "More from Uncle Eddie's", "year": null, "folder": "whelpley", "cover": "PIC00037.jpg", "photos": 52 },
-
-    { "id": "hershey-2007", "category": "trips", "title": "Hershey Park", "year": 2007, "folder": "hershey", "cover": "dsP7173741.jpg", "photos": 72 },
-    { "id": "baltimore-2003", "category": "trips", "title": "Baltimore", "year": 2003, "folder": "baltimore/images", "cover": "P1011566.jpg", "photos": 70, "minSize": 200 },
-    { "id": "point-pleasant", "category": "trips", "title": "Point Pleasant", "year": null, "folder": "pointpleasant", "cover": "P1013126.JPG", "photos": 25 },
 
     { "id": "giovanni", "category": "family", "title": "Giovanni", "year": 2003, "folder": "lunetta/giovanni", "cover": "Giovanni's1st_Bday 001.jpg", "photos": 217 },
     { "id": "helen", "category": "family", "title": "Helen", "year": 2003, "folder": "helen", "cover": "P9191621.jpg", "photos": 13 },
