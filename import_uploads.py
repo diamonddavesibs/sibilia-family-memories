@@ -134,6 +134,7 @@ def virus_scan(folder, expected):
     """True if clean. Raises FileNotFoundError if no scanner is available."""
     eset = eset_path()
     defender = None if eset else defender_path()
+    print(f"  Virus scan with {'ESET' if eset else 'Microsoft Defender' if defender else 'ClamAV'}...")
     if eset:
         # Scan only: ESET must not clean or move anything, we decide what to keep.
         res = subprocess.run([str(eset), "/clean-mode=none", "/no-quarantine", "/subdir", str(folder)],

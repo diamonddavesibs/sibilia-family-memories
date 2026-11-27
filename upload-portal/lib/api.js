@@ -173,7 +173,8 @@ export async function handleApi(request, env, user) {
   }
 
   const email = user.email;
-  const member = user.admin ? { email, name: "Site owner" } : await getJson(env, key.member(email));
+  const member = (await getJson(env, key.member(email))) ||
+    (user.admin ? { email, name: clean(env.ADMIN_NAME, LIMITS.name) || "David" } : null);
 
   // ---- Everyone signed in ----
   if (parts[0] === "me" && method === "GET") {
@@ -371,7 +372,8 @@ export async function handleApi(request, env, user) {
           if (!label) return fail(400, "The album needs a name.");
           const year = cleanYear(body.year === undefined ? album.year : body.year);
           if (year === undefined) return fail(400, "Bad year.");
-          Object.assign(album, { label, year, status: "approved", reviewedAt: new Date().toISOString(), note: "" });
+          const ownerName = clean(body.by ?? album.ownerName, LIMITS.name) || album.ownerName;
+          Object.assign(album, { label, year, ownerName, status: "approved", reviewedAt: new Date().toISOString(), note: "" });
         } else if (body.action === "reject") {
           if (album.status === "published") return fail(409, "This album is already on the site.");
           Object.assign(album, { status: "rejected", reviewedAt: new Date().toISOString(), note: clean(body.note, LIMITS.note) });
