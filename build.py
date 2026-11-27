@@ -9,6 +9,7 @@ writes web-sized copies and the HTML pages into the output folder.
 Needs Python 3 and Pillow (pip install pillow).
 """
 import argparse
+import hashlib
 import html
 import json
 import re
@@ -30,6 +31,17 @@ GENERIC_TITLE = re.compile(
     r"thanksgiving.*|halloween.*|.*picnic.*|baltimore.*|uncle eddie|helen pix\d*)$",
     re.I,
 )
+
+
+OUT = Path("dist")  # set in main()
+
+
+def v(rel):
+    """A ?v= tag from the file's contents, so browsers fetch a photo again when it changes."""
+    f = OUT / rel
+    if not f.exists():
+        return ""
+    return "?v=" + hashlib.md5(f.read_bytes()).hexdigest()[:8]
 
 
 def esc(s):
@@ -100,7 +112,7 @@ def card(ev):
     year = f'<span class="card-year">{esc(ev["year"])}</span>' if ev.get("year") else ""
     return f"""
       <a class="card" href="events/{esc(ev['id'])}/">
-        <div class="card-photo"><img src="covers/{esc(ev['id'])}.jpg" alt="{esc(event_label(ev))}" loading="lazy" width="800" height="600"></div>
+        <div class="card-photo"><img src="covers/{esc(ev['id'])}.jpg{v(f"covers/{ev['id']}.jpg")}" alt="{esc(event_label(ev))}" loading="lazy" width="800" height="600"></div>
         <div class="card-body">
           {year}
           <h3>{esc(ev['title'])}</h3>
@@ -128,6 +140,7 @@ def build_welcome(data, src, out):
     with Image.open(art) as im:
         w, h = im.size
     page = (ROOT / "templates" / "welcome.html").read_text(encoding="utf-8")
+    page = page.replace("{{css_v}}", v("assets/style.css"))
     page = (page.replace("{{title}}", esc(site["title"]))
                 .replace("{{tagline}}", esc(site["tagline"]))
                 .replace("{{splash}}", name)
@@ -140,7 +153,7 @@ def build_welcome(data, src, out):
 def build_index(data, out):
     site = data["site"]
     hero = "".join(
-        f'<img class="polaroid p{i}" src="hero/{i}.jpg" alt="" width="{HERO_SIZE}">'
+        f'<img class="polaroid p{i}" src="hero/{i}.jpg{v(f"hero/{i}.jpg")}" alt="" width="{HERO_SIZE}">'
         for i in range(len(data["hero"]))
     )
     nav = "".join(
@@ -161,6 +174,7 @@ def build_index(data, out):
     </section>""")
     total = sum(e["photos"] for e in data["events"])
     page = (ROOT / "templates" / "index.html").read_text(encoding="utf-8")
+    page = page.replace("{{css_v}}", v("assets/style.css"))
     page = (page.replace("{{title}}", esc(site["title"]))
                 .replace("{{tagline}}", esc(site["tagline"]))
                 .replace("{{hero}}", hero)
@@ -190,11 +204,12 @@ def build_event(ev, src, out, data):
 
     tiles = "".join(
         f'''
-      <a class="tile" href="photos/{n}" data-caption="{esc(c)}"><img src="thumbs/{n}" alt="{esc(c or event_label(ev))}" loading="lazy" width="400" height="300"></a>'''
+      <a class="tile" href="photos/{n}{v(f"events/{ev['id']}/photos/{n}")}" data-caption="{esc(c)}"><img src="thumbs/{n}{v(f"events/{ev['id']}/thumbs/{n}")}" alt="{esc(c or event_label(ev))}" loading="lazy" width="400" height="300"></a>'''
         for n, c in items
     )
     year = f'<p class="event-year">{esc(ev["year"])}</p>' if ev.get("year") else ""
     page = (ROOT / "templates" / "event.html").read_text(encoding="utf-8")
+    page = page.replace("{{css_v}}", v("assets/style.css")).replace("{{js_v}}", v("assets/gallery.js"))
     page = (page.replace("{{site_title}}", esc(data["site"]["title"]))
                 .replace("{{title}}", esc(ev["title"]))
                 .replace("{{label}}", esc(event_label(ev)))
@@ -210,7 +225,9 @@ def main():
     ap.add_argument("--source", required=True, help="the old sibilia.us folder")
     ap.add_argument("--out", default="dist")
     args = ap.parse_args()
+    global OUT
     src, out = Path(args.source), Path(args.out)
+    OUT = out
     data = json.loads((ROOT / "events.json").read_text(encoding="utf-8"))
 
     out.mkdir(parents=True, exist_ok=True)
