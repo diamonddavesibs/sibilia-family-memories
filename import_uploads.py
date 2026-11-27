@@ -10,8 +10,9 @@ build.py run gives it a card and a gallery.
 
 Every photo goes through four checks before it can reach the site:
   1. It is downloaded into a quarantine folder, never straight into the site.
-  2. A virus scan runs over the quarantine folder: Microsoft Defender on
-     Windows, or ClamAV's clamscan elsewhere. If neither is available the
+  2. A virus scan runs over the quarantine folder: ESET's command-line
+     scanner (ecls.exe) if ESET is installed, otherwise Microsoft Defender
+     on Windows, or ClamAV's clamscan elsewhere. If neither is available the
      import stops, unless you pass --skip-virus-scan on purpose.
   3. Pillow opens it and it must really be a JPEG, PNG or HEIC photo of a
      sensible size (no "decompression bombs").
@@ -107,6 +108,18 @@ def put_json(r2, bucket, key, data):
     r2.put_object(Bucket=bucket, Key=key, Body=json.dumps(data).encode(), ContentType="application/json")
 
 
+def eset_path():
+    if os.name != "nt":
+        return None
+    for var in ("ProgramFiles", "ProgramW6432", "ProgramFiles(x86)"):
+        base = os.environ.get(var)
+        if base:
+            found = sorted(Path(base, "ESET").glob("*/ecls.exe"))
+            if found:
+                return found[0]
+    return None
+
+
 def defender_path():
     if os.name != "nt":
         return None
@@ -119,8 +132,19 @@ def defender_path():
 
 def virus_scan(folder, expected):
     """True if clean. Raises FileNotFoundError if no scanner is available."""
-    defender = defender_path()
-    if defender:
+    eset = eset_path()
+    defender = None if eset else defender_path()
+    if eset:
+        # Scan only: ESET must not clean or move anything, we decide what to keep.
+        res = subprocess.run([str(eset), "/clean-mode=none", "/no-quarantine", "/subdir", str(folder)],
+                             capture_output=True, text=True)
+        if res.returncode in (1, 50):
+            print(res.stdout.strip()[-500:])
+            return False
+        if res.returncode != 0:
+            # 10 = some files could not be scanned, 100+ = scanner error: never treat as clean.
+            raise RuntimeError(f"ESET could not finish the scan (code {res.returncode}); nothing was imported")
+    elif defender:
         res = subprocess.run([str(defender), "-Scan", "-ScanType", "3", "-File", str(folder),
                               "-DisableRemediation"], capture_output=True, text=True)
         if res.returncode == 2:
@@ -227,9 +251,12 @@ def main():
         else:
             try:
                 clean = not blocked and virus_scan(box, files)
+            except RuntimeError as e:
+                shutil.rmtree(quarantine, ignore_errors=True)
+                sys.exit(f"{e}. The album is still waiting; try again later.")
             except FileNotFoundError:
                 shutil.rmtree(quarantine, ignore_errors=True)
-                sys.exit("No virus scanner found (Microsoft Defender or ClamAV), so nothing was imported.\n"
+                sys.exit("No virus scanner found (ESET, Microsoft Defender or ClamAV), so nothing was imported.\n"
                          "Install one, or run again with --skip-virus-scan.")
             if not clean:
                 print(f"  VIRUS FOUND in '{album['label']}'. Album not imported; marked rejected.")

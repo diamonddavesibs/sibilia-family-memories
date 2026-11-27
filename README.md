@@ -30,4 +30,4 @@ python import_uploads.py   (on Windows: double-click import-uploads.bat)
 python build.py --source "M:/Sibilia.us/sibilia.us" --out dist
 ```
 
-`import_uploads.py` virus-scans each photo (Microsoft Defender on Windows, ClamAV elsewhere), re-saves it as a clean JPEG, and keeps the clean copies in `M:/Sibilia.us/family-uploads` (outside git, like the other photos). Its settings live in `uploads.env`, which is never committed. Albums appear in a "Shared by the Family" section. Set `site.uploadUrl` in `events.json` to add a footer link to the upload page.
+`import_uploads.py` virus-scans each photo (ESET or Microsoft Defender on Windows, ClamAV elsewhere), re-saves it as a clean JPEG, and keeps the clean copies in `M:/Sibilia.us/family-uploads` (outside git, like the other photos). Its settings live in `uploads.env`, which is never committed. Albums appear in a "Shared by the Family" section. Set `site.uploadUrl` in `events.json` to add a footer link to the upload page.
