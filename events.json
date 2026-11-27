@@ -7,8 +7,7 @@
   "categories": [
     { "id": "fourth", "title": "Fourth of July Picnics" },
     { "id": "parties", "title": "Parties & Celebrations" },
-    { "id": "picnics", "title": "Uncle Eddie's Father's Day Picnics" },
-    { "id": "family", "title": "Family" }
+    { "id": "picnics", "title": "Uncle Eddie's Father's Day Picnics" }
   ],
   "hero": ["4th2000bob/2000_42.jpg", "whelpley/2003/P6151293.JPG", "halloween06/PA313471.JPG", "fourth2002/4th_2002 026.jpg", "bobjen/PIC00036.jpg"],
   "events": [
@@ -29,10 +28,6 @@
     { "id": "fathers-day-2002", "category": "picnics", "title": "Father's Day Picnic", "year": 2002, "folder": "whelpley/2002", "cover": "Fathers_Day2002 016.jpg", "photos": 43 },
     { "id": "fathers-day-2003", "category": "picnics", "title": "Father's Day Picnic", "year": 2003, "folder": "whelpley/2003", "cover": "P6151293.JPG", "photos": 60 },
     { "id": "fathers-day-2005", "category": "picnics", "title": "Father's Day Picnic", "year": 2005, "folder": "whelpley/2005", "cover": "P1012976.JPG", "photos": 15 },
-    { "id": "fathers-day-more", "category": "picnics", "title": "More from Uncle Eddie's", "year": null, "folder": "whelpley", "cover": "PIC00037.jpg", "photos": 52 },
-
-    { "id": "giovanni", "category": "family", "title": "Giovanni", "year": 2003, "folder": "lunetta/giovanni", "cover": "Giovanni's1st_Bday 001.jpg", "photos": 217 },
-    { "id": "helen", "category": "family", "title": "Helen", "year": 2003, "folder": "helen", "cover": "P9191621.jpg", "photos": 13 },
-    { "id": "elena", "category": "family", "title": "Elena", "year": null, "folder": "elena/images", "cover": "elena-bday.jpg", "photos": 8 }
+    { "id": "fathers-day-more", "category": "picnics", "title": "More from Uncle Eddie's", "year": null, "folder": "whelpley", "cover": "PIC00037.jpg", "photos": 52 }
   ]
 }
