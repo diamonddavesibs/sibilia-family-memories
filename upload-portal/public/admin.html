@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Review Uploads · Sibilia Family Memories</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <header class="top">
+    <p class="eyebrow">Sibilia Family Memories</p>
+    <h1>Review uploads</h1>
+    <p class="who"><a href="/">Upload page</a></p>
+  </header>
+  <main>
+    <p class="error" id="error" hidden></p>
+
+    <section class="panel">
+      <h2>People asking for access</h2>
+      <ul id="requests" class="rows"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Albums waiting for you</h2>
+      <div id="pending"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Approved, ready to add to the site</h2>
+      <p class="hint">These get picked up the next time the site is rebuilt on David's computer (import_uploads.py), where every photo is virus-scanned and re-saved as a clean copy.</p>
+      <ul id="approved" class="rows"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Family members</h2>
+      <ul id="members" class="rows"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Past albums</h2>
+      <ul id="past" class="rows"></ul>
+    </section>
+  </main>
+  <script src="/admin.js"></script>
+</body>
+</html>

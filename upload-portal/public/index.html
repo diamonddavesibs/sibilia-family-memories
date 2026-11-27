@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Share Photos · Sibilia Family Memories</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <header class="top">
+    <p class="eyebrow">Sibilia Family Memories</p>
+    <h1>Share your photos</h1>
+    <p class="who" id="who"></p>
+  </header>
+
+  <main>
+    <p id="loading" class="panel">Loading…</p>
+
+    <!-- Not approved yet: ask for access -->
+    <section id="request" class="panel" hidden>
+      <h2>Ask for access</h2>
+      <p>To keep the family site safe, David approves everyone who shares photos. Tell him who you are and he'll let you in.</p>
+      <form id="request-form">
+        <label>Your name <input name="name" maxlength="60" required autocomplete="name"></label>
+        <label>How you're part of the family <span class="hint">(optional)</span>
+          <input name="relation" maxlength="300" placeholder="e.g. Rose's daughter"></label>
+        <button type="submit">Send request</button>
+        <p class="error" hidden></p>
+      </form>
+    </section>
+
+    <section id="waiting" class="panel" hidden>
+      <h2>Thanks, your request is in</h2>
+      <p>David will review it soon. Come back to this page later; once you're approved you'll be able to upload photos here.</p>
+    </section>
+
+    <section id="blocked" class="panel" hidden>
+      <h2>Not available</h2>
+      <p>This sign-in hasn't been approved for uploads. If you think that's a mistake, please contact David.</p>
+    </section>
+
+    <!-- Approved: upload -->
+    <section id="upload" class="panel" hidden>
+      <h2>New album</h2>
+      <p>Your photos become a new card on the family site once David has looked them over.</p>
+      <form id="album-form">
+        <label>Album name <input name="label" maxlength="80" required placeholder="e.g. Aunt Rose's 80th Birthday"></label>
+        <label>Year <span class="hint">(optional)</span> <input name="year" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="2025"></label>
+        <label>A few words about it <span class="hint">(optional)</span>
+          <textarea name="description" maxlength="500" rows="2"></textarea></label>
+        <label class="drop" id="drop">
+          <input type="file" id="files" accept="image/jpeg,image/png,image/heic,image/heif,.jpg,.jpeg,.png,.heic,.heif" multiple>
+          <span><strong>Choose photos</strong> or drag them here<br><span class="hint">JPEG, PNG or iPhone photos, up to 30 MB each</span></span>
+        </label>
+        <div id="picked" class="picked"></div>
+        <p id="picked-summary" class="hint"></p>
+        <button type="submit" id="send">Upload album</button>
+        <div id="progress" class="progress" hidden><div></div></div>
+        <p class="status" id="status"></p>
+        <p class="error" hidden></p>
+      </form>
+    </section>
+
+    <section id="mine" class="panel" hidden>
+      <h2>Your albums</h2>
+      <ul id="mine-list" class="albums"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>Every photo is checked and cleaned before it goes on the site.</p>
+  </footer>
+  <script src="/app.js"></script>
+</body>
+</html>

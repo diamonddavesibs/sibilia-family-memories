@@ -19,3 +19,15 @@ python build.py --source "M:/Sibilia.us/sibilia.us" --out dist
 ```
 
 Open `dist/index.html` in a browser to preview. Upload the contents of `dist/` to DreamHost to publish.
+
+## Family uploads
+
+Family members can share albums through a separate upload page (see `upload-portal/`). After David approves an album there, bring it onto the site before building:
+
+```
+pip install pillow-heif boto3
+python import_uploads.py
+python build.py --source "M:/Sibilia.us/sibilia.us" --out dist
+```
+
+`import_uploads.py` virus-scans each photo with ClamAV, re-saves it as a clean JPEG, and keeps the clean copies in `M:/Sibilia.us/family-uploads` (outside git, like the other photos). Its settings live in `uploads.env`, which is never committed. Albums appear in a "Shared by the Family" section. Set `site.uploadUrl` in `events.json` to add a footer link to the upload page.

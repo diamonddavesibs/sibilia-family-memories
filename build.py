@@ -110,13 +110,14 @@ def event_label(ev):
 
 def card(ev):
     year = f'<span class="card-year">{esc(ev["year"])}</span>' if ev.get("year") else ""
+    by = f" &middot; shared by {esc(ev['by'])}" if ev.get("by") else ""
     return f"""
       <a class="card" href="events/{esc(ev['id'])}/">
         <div class="card-photo"><img src="covers/{esc(ev['id'])}.jpg{v(f"covers/{ev['id']}.jpg")}" alt="{esc(event_label(ev))}" loading="lazy" width="800" height="600"></div>
         <div class="card-body">
           {year}
           <h3>{esc(ev['title'])}</h3>
-          <p>{esc(ev['photos'])} photos</p>
+          <p>{esc(ev['photos'])} photos{by}</p>
         </div>
       </a>"""
 
@@ -150,6 +151,14 @@ def build_welcome(data, src, out):
     (out / "index.html").write_text(page, encoding="utf-8")
 
 
+def upload_link(site):
+    """Footer link to the family upload page, once site.uploadUrl is set in events.json."""
+    url = site.get("uploadUrl", "")
+    if not url.startswith("https://"):
+        return ""
+    return f'<p><a href="{esc(url)}">Family members: share your photos</a></p>'
+
+
 def build_index(data, out):
     site = data["site"]
     hero = "".join(
@@ -180,6 +189,7 @@ def build_index(data, out):
                 .replace("{{hero}}", hero)
                 .replace("{{nav}}", nav)
                 .replace("{{sections}}", "".join(sections))
+                .replace("{{upload_link}}", upload_link(site))
                 .replace("{{events_count}}", str(len(data["events"])))
                 .replace("{{photos_count}}", f"{total:,}"))
     (out / (home_page(data) or "index.html")).write_text(page, encoding="utf-8")
@@ -220,15 +230,31 @@ def build_event(ev, src, out, data):
     (dest / "index.html").write_text(page, encoding="utf-8")
 
 
+def add_family_uploads(data, uploads):
+    """Albums family members shared through the upload page (see import_uploads.py).
+    They live in their own folder, outside git, with their own events.json."""
+    listing = uploads / "events.json"
+    if not listing.exists():
+        return
+    extra = json.loads(listing.read_text(encoding="utf-8"))
+    for ev in extra:
+        ev["folder"] = str((uploads / ev["folder"]).resolve())
+    data["events"] += extra
+    if extra and not any(c["id"] == "family" for c in data["categories"]):
+        data["categories"].append({"id": "family", "title": "Shared by the Family"})
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--source", required=True, help="the old sibilia.us folder")
     ap.add_argument("--out", default="dist")
+    ap.add_argument("--uploads", help="folder of family uploads (default: family-uploads next to --source)")
     args = ap.parse_args()
     global OUT
     src, out = Path(args.source), Path(args.out)
     OUT = out
     data = json.loads((ROOT / "events.json").read_text(encoding="utf-8"))
+    add_family_uploads(data, Path(args.uploads) if args.uploads else src.resolve().parent / "family-uploads")
 
     out.mkdir(parents=True, exist_ok=True)
     # Kept next to the output folder, not inside it, so it never gets uploaded.
