@@ -1,0 +1,54 @@
+{
+  "site": {
+    "title": "Sibilia Family Memories",
+    "tagline": "Picnics, parties and good times, saved for the whole family.",
+    "since": 2000
+  },
+  "categories": [
+    { "id": "fourth", "title": "Fourth of July Picnics" },
+    { "id": "golf", "title": "The Sibilia 21st Century Golf Classic" },
+    { "id": "parties", "title": "Parties & Celebrations" },
+    { "id": "picnics", "title": "Uncle Eddie's Father's Day Picnics" },
+    { "id": "trips", "title": "Trips & Outings" },
+    { "id": "family", "title": "Family" }
+  ],
+  "hero": ["4th2000bob/2000_42.jpg", "golf/2005/P5222744.JPG", "halloween06/PA313471.JPG", "lunetta/Joe__Karleens_36.jpg", "bobjen/PIC00036.jpg"],
+  "events": [
+    { "id": "fourth-2000-bobby", "category": "fourth", "title": "Fourth of July at Bobby's", "year": 2000, "folder": "4th2000bob", "cover": "2000_42.jpg", "photos": 51 },
+    { "id": "fourth-2000-lunetta", "category": "fourth", "title": "Fourth of July at the Lunettas'", "year": 2000, "folder": "4th2000joe", "cover": "PIC00007.jpg", "photos": 20 },
+    { "id": "fourth-2001", "category": "fourth", "title": "Fourth of July", "year": 2001, "folder": "4th2001bob", "cover": "PIC00039.jpg", "photos": 54 },
+    { "id": "fourth-2002", "category": "fourth", "title": "Fourth of July", "year": 2002, "folder": "fourth2002", "cover": "4th_2002 026.jpg", "photos": 36 },
+    { "id": "sibilia-picnic", "category": "fourth", "title": "Sibilia Family Picnic", "year": null, "folder": "sibiliapages", "cover": "Fourth_of_July_3.jpg", "photos": 66 },
+    { "id": "fourth-joe-karleen", "category": "fourth", "title": "Fourth of July at Joe & Karleen's", "year": null, "folder": "lunetta", "cover": "Joe__Karleens_36.jpg", "photos": 41 },
+
+    { "id": "golf-2001", "category": "golf", "title": "Golf Classic", "year": 2001, "folder": "golf/2001", "cover": "PIC43.jpg", "photos": 47 },
+    { "id": "golf-2002", "category": "golf", "title": "Golf Classic", "year": 2002, "folder": "golf/2002", "cover": "golf_2002 034.jpg", "photos": 48 },
+    { "id": "golf-2003", "category": "golf", "title": "Golf Classic", "year": 2003, "folder": "golf/2003", "cover": "P1011058.JPG", "photos": 102 },
+    { "id": "golf-2004", "category": "golf", "title": "Golf Classic", "year": 2004, "folder": "golf/2004", "cover": "P1012030.JPG", "photos": 40 },
+    { "id": "golf-2005", "category": "golf", "title": "Golf Classic", "year": 2005, "folder": "golf/2005", "cover": "P5222744.JPG", "photos": 38 },
+    { "id": "golf-2007", "category": "golf", "title": "Golf Classic", "year": 2007, "folder": "golf/2007", "cover": "P6103639.JPG", "photos": 39 },
+
+    { "id": "bobby-jenny-50th", "category": "parties", "title": "Bobby & Jenny's 50th Anniversary", "year": null, "folder": "bobjen", "cover": "PIC00036.jpg", "photos": 38 },
+    { "id": "rose-40th", "category": "parties", "title": "Rose's 40th Birthday", "year": null, "folder": "rose", "cover": "rose-25.jpg", "photos": 25 },
+    { "id": "anita-75th", "category": "parties", "title": "Sr. Anita's 75th Birthday", "year": 2003, "folder": "anita/images", "cover": "P1010589.JPG", "photos": 25 },
+    { "id": "karleen-30th", "category": "parties", "title": "Karleen's 30th", "year": null, "folder": "lunetta/karleen30", "cover": "PIC00026.jpg", "photos": 32 },
+    { "id": "new-years-2002", "category": "parties", "title": "New Year's Eve", "year": 2002, "folder": "lunetta/newyears2002", "cover": "nye-2002-17.jpg", "photos": 25 },
+    { "id": "halloween-2006", "category": "parties", "title": "Halloween", "year": 2006, "folder": "halloween06", "cover": "PA313471.JPG", "photos": 23 },
+    { "id": "thanksgiving-2001", "category": "parties", "title": "Thanksgiving", "year": 2001, "folder": "thanksgiving", "cover": "t-22.jpg", "photos": 28 },
+    { "id": "carmine-donna", "category": "parties", "title": "Carmine & Donna", "year": 2004, "folder": "carmine-donna/images", "cover": "P7302349.JPG", "photos": 75 },
+    { "id": "giuseppe-jill", "category": "parties", "title": "Giuseppe & Jill", "year": 2005, "folder": "giuseppe-jill/images", "cover": "P6112857.JPG", "photos": 106 },
+
+    { "id": "fathers-day-2002", "category": "picnics", "title": "Father's Day Picnic", "year": 2002, "folder": "whelpley/2002", "cover": "Fathers_Day2002 016.jpg", "photos": 43 },
+    { "id": "fathers-day-2003", "category": "picnics", "title": "Father's Day Picnic", "year": 2003, "folder": "whelpley/2003", "cover": "P6151293.JPG", "photos": 60 },
+    { "id": "fathers-day-2005", "category": "picnics", "title": "Father's Day Picnic", "year": 2005, "folder": "whelpley/2005", "cover": "P1012976.JPG", "photos": 15 },
+    { "id": "fathers-day-more", "category": "picnics", "title": "More from Uncle Eddie's", "year": null, "folder": "whelpley", "cover": "PIC00037.jpg", "photos": 52 },
+
+    { "id": "hershey-2007", "category": "trips", "title": "Hershey Park", "year": 2007, "folder": "hershey", "cover": "dsP7173741.jpg", "photos": 72 },
+    { "id": "baltimore-2003", "category": "trips", "title": "Baltimore", "year": 2003, "folder": "baltimore/images", "cover": "P1011566.jpg", "photos": 70, "minSize": 200 },
+    { "id": "point-pleasant", "category": "trips", "title": "Point Pleasant", "year": null, "folder": "pointpleasant", "cover": "P1013126.JPG", "photos": 25 },
+
+    { "id": "giovanni", "category": "family", "title": "Giovanni", "year": 2003, "folder": "lunetta/giovanni", "cover": "Giovanni's1st_Bday 001.jpg", "photos": 217 },
+    { "id": "helen", "category": "family", "title": "Helen", "year": 2003, "folder": "helen", "cover": "P9191621.jpg", "photos": 13 },
+    { "id": "elena", "category": "family", "title": "Elena", "year": null, "folder": "elena/images", "cover": "elena-bday.jpg", "photos": 8 }
+  ]
+}
