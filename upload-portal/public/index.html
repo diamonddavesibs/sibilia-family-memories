@@ -45,20 +45,25 @@
 
     <!-- Approved: upload -->
     <section id="upload" class="panel" hidden>
-      <h2>New album</h2>
-      <p>Your photos become a new card on the family site once David has looked them over.</p>
+      <h2 id="upload-title">New album</h2>
+      <p id="upload-intro">Your photos become a new card on the family site once David has looked them over.</p>
       <form id="album-form">
-        <label>Album name <input name="label" maxlength="80" required placeholder="e.g. Aunt Rose's 80th Birthday"></label>
-        <label>Year <span class="hint">(optional)</span> <input name="year" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="2025"></label>
-        <label>A few words about it <span class="hint">(optional)</span>
-          <textarea name="description" maxlength="500" rows="2"></textarea></label>
+        <div id="album-fields" class="fields-stack">
+          <label>Album name <input name="label" id="label" maxlength="80" required placeholder="e.g. Aunt Rose's 80th Birthday"></label>
+          <label>Year <span class="hint">(optional)</span> <input name="year" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="2025"></label>
+          <label>A few words about it <span class="hint">(optional)</span>
+            <textarea name="description" maxlength="500" rows="2"></textarea></label>
+        </div>
         <label class="drop" id="drop">
           <input type="file" id="files" accept="image/jpeg,image/png,image/heic,image/heif,.jpg,.jpeg,.png,.heic,.heif" multiple>
           <span><strong>Choose photos</strong> or drag them here<br><span class="hint">JPEG, PNG or iPhone photos, up to 30 MB each</span></span>
         </label>
         <div id="picked" class="picked"></div>
         <p id="picked-summary" class="hint"></p>
-        <button type="submit" id="send">Upload album</button>
+        <div class="actions">
+          <button type="submit" id="send">Upload album</button>
+          <button type="button" class="quiet" id="cancel-add" hidden>Cancel</button>
+        </div>
         <div id="progress" class="progress" hidden><div></div></div>
         <p class="status" id="status"></p>
         <p class="error" hidden></p>

@@ -65,7 +65,9 @@ async function reviewCard(a) {
   const by = el("input", { value: a.ownerName || "", maxlength: "60", placeholder: "Shared by", "aria-label": "Shared by" });
   const note = el("input", { maxlength: "300", placeholder: "Reason, if you turn it down (they'll see this)", "aria-label": "Reason" });
   const thumbs = el("div", { class: "thumbs" });
+  if (a.addTo) { label.disabled = true; year.disabled = true; }
   wrap.append(...[
+    a.addTo ? el("p", { text: "More photos for an album already sent: \u201c" + a.label + "\u201d" }) : null,
     el("p", { class: "hint", text: "From " + a.ownerName + " (" + a.owner + ") · " + a.photoCount + " photos · sent " + when(a.submittedAt) }),
     el("div", { class: "fields" }, label, year),
     el("label", { class: "hint", text: "Card says \u201cshared by\u201d:" }, by),
@@ -107,7 +109,7 @@ async function load() {
   if (!pending.children.length) pending.append(el("p", { class: "hint", text: "Nothing to review." }));
 
   const row = (a, ...actions) => el("li", {},
-    el("div", { class: "grow" }, el("strong", { text: a.label + (a.year ? " (" + a.year + ")" : "") }),
+    el("div", { class: "grow" }, el("strong", { text: (a.addTo ? "More photos for " : "") + a.label + (a.year ? " (" + a.year + ")" : "") }),
       el("span", { class: "hint", text: a.ownerName + " · " + a.photoCount + " photos · " + when(a.reviewedAt || a.createdAt) + (a.note ? " · " + a.note : "") })),
     el("span", { class: "badge " + a.status, text: a.status }), ...actions);
 

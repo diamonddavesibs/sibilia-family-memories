@@ -59,3 +59,6 @@ footer { text-align: center; color: var(--muted); font-size: 15px; padding: 10px
 @media (max-width: 520px) { .panel { padding: 16px; } .review .fields { grid-template-columns: 1fr; } }
 a.mail { font-weight: 600; font-size: 15px; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 8px 16px; text-decoration: none; }
 a.mail:hover { text-decoration: underline; }
+.fields-stack { display: grid; gap: 14px; }
+.fields-stack[hidden] { display: none; }
+form .actions { display: flex; flex-wrap: wrap; gap: 8px; }

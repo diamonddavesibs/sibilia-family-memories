@@ -144,8 +144,8 @@ function newAlbumId() {
 }
 
 function publicAlbum(a) {
-  const { id, label, year, description, ownerName, owner, status, photoCount, createdAt, submittedAt, reviewedAt, note } = a;
-  return { id, label, year, description, ownerName, owner, status, photoCount, createdAt, submittedAt, reviewedAt, note };
+  const { id, label, year, description, ownerName, owner, status, photoCount, createdAt, submittedAt, reviewedAt, note, addTo } = a;
+  return { id, label, year, description, ownerName, owner, status, photoCount, createdAt, submittedAt, reviewedAt, note, addTo };
 }
 
 async function readBody(request) {
@@ -220,9 +220,20 @@ export async function handleApi(request, env, user) {
     if (!id && method === "POST") {
       const body = await readBody(request);
       if (!body) return fail(400, "Bad request.");
-      const label = clean(body.label, LIMITS.label);
+      // Adding more photos to one of your own albums: a small linked upload
+      // that David reviews like any other, then joins the same card.
+      let parent = null;
+      if (body.addTo !== undefined && body.addTo !== null && body.addTo !== "") {
+        if (!ALBUM_ID.test(String(body.addTo))) return fail(404, "Album not found.");
+        parent = await getJson(env, key.album(body.addTo));
+        if (!parent || parent.owner !== email || parent.addTo) return fail(404, "Album not found.");
+        if (!["pending", "approved", "published"].includes(parent.status)) {
+          return fail(409, "Photos can only be added to albums that have been sent.");
+        }
+      }
+      const label = parent ? parent.label : clean(body.label, LIMITS.label);
       if (!label) return fail(400, "Please give your album a name.");
-      const year = cleanYear(body.year);
+      const year = parent ? parent.year : cleanYear(body.year);
       if (year === undefined) return fail(400, "Please enter a year like 2024, or leave it blank.");
       const open = (await listAlbums(env)).filter(
         (a) => a.owner === email && (a.status === "uploading" || a.status === "pending"),
@@ -234,7 +245,8 @@ export async function handleApi(request, env, user) {
         id: newAlbumId(),
         label,
         year,
-        description: clean(body.description, LIMITS.description),
+        description: parent ? "" : clean(body.description, LIMITS.description),
+        ...(parent ? { addTo: parent.id } : {}),
         owner: email,
         ownerName: member.name,
         status: "uploading",
